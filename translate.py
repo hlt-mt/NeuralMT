@@ -1,13 +1,12 @@
-import argparse
-import json
-import os
 import sys
+import argparse
+import codecs
 
 from nmmt import NMTDecoder
 
 import logging
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-import codecs
 
 # Base models and Decoder definitions
 # ======================================================================================================================
@@ -16,12 +15,6 @@ class Suggestion:
         self.source = source
         self.target = target
         self.score = score
-
-def reportScore(name, scoreTotal, wordsTotal):
-    print("%s AVG SCORE: %.4f, %s PPL: %.4f" % (
-        name, scoreTotal / wordsTotal,
-        name, math.exp(-scoreTotal/wordsTotal)))
-
 
 def addone(f):
     for line in f:
@@ -50,7 +43,7 @@ def run_main():
     for line in addone(codecs.open(args.src, 'r', 'utf-8')):
         if line is not None:
             translation = decoder.translate(line, suggestions)
-            print "translation:|%s|" % translation
+            print "%s" % translation
 
 if __name__ == '__main__':
     run_main()

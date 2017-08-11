@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import shutil
 
@@ -7,13 +8,17 @@ from cli.mmt.neural import OpenNMTDecoder, OpenNMTPreprocessor
 
 import torch
 
+import logging
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
 class OpenNMTEngine:
-    #def __init__(self, source_lang, target_lang, decoder_path):
     def __init__(self, opt):
+        self._logger = logging.getLogger('nmmt.OpenNMTEngine')
+        self._log_level = logging.INFO
 
-
-#args.source_lang, args.target_lang, args.model_path
-
+        # TODO
+        # Retrieval engine to get suggestion for instance-based adaptation
+        # self.memory = TranslationMemory(os.path.join(opt.model_path, 'memory'), opt.source_lang, opt.target_lang)
 
         # Neural specific processing (BPE)
         self.onmt_preprocessor = OpenNMTPreprocessor(opt.source_lang, opt.target_lang, os.path.join(opt.model_path, 'model.bpe'))
@@ -21,19 +26,20 @@ class OpenNMTEngine:
         # Neural engine
         self.decoder = OpenNMTDecoder(os.path.join(opt.model_path, 'model.pt'), opt.source_lang, opt.target_lang, opt.gpus)
 
+    # TODO
     #     def _build_memory(self, args, skip=False, log=None):
     #         if not skip:
     #             corpora = filter(None, [args.filtered_bilingual_corpora, args.processed_bilingual_corpora,
     #                                     args.bilingual_corpora])[0]
     #
-    #             self._engine.memory.create(corpora, log=log)
+    #             self.memory.create(corpora, log=log)
 
     def _prepare_training_data(self, opt, skip=False):
 
         training_corpora = BilingualCorpus.list(opt.training_corpora)
-        print 'training_corpora:%s' % repr(training_corpora)
         valid_corpora = BilingualCorpus.list(opt.valid_corpora)
-        print 'valid_corpora:%s' % repr(valid_corpora)
+        self._logger.log(self._log_level, 'training corpora:%s' % repr(training_corpora))
+        self._logger.log(self._log_level, 'validation corpora:%s' % repr(valid_corpora))
 
         if not skip:
             self.onmt_preprocessor.process(training_corpora, valid_corpora, opt.training_dir,
@@ -91,12 +97,13 @@ def run_main():
     else:
         gpus = None
 
-    decoder_path = os.path.join(args.model_path, 'decoder')
-
     # retrival engine to get suggestion for instance-based adaptation
     # memory = TranslationMemory(os.path.join(decoder_path, 'memory'), self.source_lang, self.target_lang)
 
     engine = OpenNMTEngine(args)
+
+    # TODO
+    # engine._build_memory(args, skip=False)
 
     engine._prepare_training_data(args, skip=False)
 

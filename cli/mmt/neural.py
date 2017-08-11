@@ -1,31 +1,18 @@
-import glob
-import logging
 import os
-import shutil
-import sys
+import logging
 
 import time
 
-#from cli import mmt_javamain, LIB_DIR
-
 from cli.libs import fileutils
-
-#from cli.libs import shell
 
 from cli.mmt import BilingualCorpus
 
-#from cli.mmt.engine import Engine, EngineBuilder
-#from cli.mmt.processing import TrainingPreprocessor
-
-
 #sys.path.insert(0, os.path.abspath(os.path.join(LIB_DIR, 'pynmt')))
 
-import src.mt.python.onmt as onmt
+import onmt
 
-#from src.mt.python.onmt import Dict
-#rom src.mt.python.onmt import Constants
+from nmmt import NMTEngineTrainer, SubwordTextProcessor, TrainingInterrupt
 
-from src.mt.python.nmmt import NMTEngineTrainer, SubwordTextProcessor, TrainingInterrupt
 import torch
 
 
@@ -85,8 +72,6 @@ class OpenNMTPreprocessor:
                 return self._reader
 
         self._logger.info('Creating VBE vocabulary')
-        print 'Creating VBE vocabulary'
-        print 'CORPORA:%s' % repr(corpora)
         vb_builder = SubwordTextProcessor.Builder(symbols=bpe_symbols, max_vocabulary_size=max_vocab_size)
         bpe_encoder = vb_builder.build([_ReaderWrapper(c, [self._source_lang, self._target_lang]) for c in corpora])
         bpe_encoder.save_to_file(self._bpe_model)
@@ -184,7 +169,6 @@ class OpenNMTDecoder:
         # Loading training data ----------------------------------------------------------------------------------------
         data_file = os.path.join(data_path, 'train_processed.train.pt')
         logger.info('Loading data from "%s"... START' % data_file)
-        print 'Loading data from "%s"... START' % data_file
         start_time = time.time()
         data_set = torch.load(data_file)
         logger.info('Loading data... END %.2fs' % (time.time() - start_time))
