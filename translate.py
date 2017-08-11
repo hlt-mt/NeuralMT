@@ -5,7 +5,7 @@ import codecs
 from nmmt import NMTDecoder
 
 import logging
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 
 # Base models and Decoder definitions

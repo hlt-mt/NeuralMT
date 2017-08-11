@@ -9,7 +9,7 @@ from cli.mmt.neural import OpenNMTDecoder, OpenNMTPreprocessor
 import torch
 
 import logging
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 class OpenNMTEngine:
     def __init__(self, opt):
@@ -87,15 +87,15 @@ def run_main():
 
     if torch.cuda.is_available():
         if args.gpus is None:
-            gpus = range(torch.cuda.device_count()) if torch.cuda.is_available() else None
+            args.gpus = range(torch.cuda.device_count()) if torch.cuda.is_available() else None
         else:
             # remove indexes of GPUs which are not valid,
             # because larger than the number of available GPU or smaller than 0
-            gpus = [x for x in args.gpus if x < torch.cuda.device_count() or x < 0]
+            args.gpus = [x for x in args.gpus if x < torch.cuda.device_count() or x < 0]
             if len(gpus) == 0:
                 gpus = None
     else:
-        gpus = None
+        args.gpus = None
 
     # retrival engine to get suggestion for instance-based adaptation
     # memory = TranslationMemory(os.path.join(decoder_path, 'memory'), self.source_lang, self.target_lang)
